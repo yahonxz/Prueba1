@@ -4,6 +4,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -16,15 +19,30 @@ import com.example.prueba1.ui.theme.Prueba1Theme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        //enableEdgeToEdge()
         setContent {
-            Prueba1Theme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+            //Layouts
+            Column {
+                //Los pone en filas
+                Text(text = "First Row")
+                Text(text = "Second Row")
+                Text(text = "Third Row")
+
+                //Los pone todos seguidos en la misma linea
+                Row {
+                    Text(text = "TEXT 1")
+                    Text(text = "TEXT 2")
+                    Text(text = "TEXT 3")
+                    Text(text = "TEXT 4")
                 }
+
+                //Enpalmatodo y lo puedes poner izquierda dercha etc
+                Box {
+                    Text(text = "label 1")
+                    Text(text = "label 2")
+                }
+
+                Greeting(name = "World!")
             }
         }
     }
@@ -42,6 +60,6 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 @Composable
 fun GreetingPreview() {
     Prueba1Theme {
-        Greeting("Android")
+        Greeting("Jorge")
     }
 }
