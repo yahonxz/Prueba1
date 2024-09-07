@@ -1,9 +1,11 @@
 package com.example.prueba1
 
+import android.graphics.Picture
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -21,9 +23,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.prueba1.ui.theme.Prueba1Theme
 
 class MainActivity : ComponentActivity() {
@@ -58,8 +69,8 @@ class MainActivity : ComponentActivity() {
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment= androidx.compose.ui.Alignment.CenterHorizontally
-                
-                
+
+
             ){
                 Text(text = "simple text")
                 ModifierExample2()
@@ -68,6 +79,9 @@ class MainActivity : ComponentActivity() {
 
 
             }
+            customText()
+            pictureMod()
+
         }
     }
 }
@@ -80,35 +94,35 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
     )
 }
 
-@Preview(showBackground = true)
+
 @Composable
 fun GreetingPreview() {
     Prueba1Theme {
         Greeting("Caro")
     }
 }
-@Preview(showBackground = true)
+
 @Composable
 fun  ModifierExample2(){
-    
+
     Column (
         modifier = Modifier
             .padding(24.dp)
             .fillMaxWidth()
             .clickable(onClick = { clickAction() })
-        
+
     ){
         Text(text = "hello world")
     }
 
-     
+
 }
 
 fun clickAction() {
     println("Colum clicked")
 }
 
-@Preview(showBackground = true)
+
 @Composable
 fun  ModifierExample3(){
 
@@ -131,4 +145,41 @@ fun  ModifierExample3(){
     }
 
 
+}
+@Preview(showBackground = true)
+@Composable
+fun customText(){
+    Column {
+        Text(
+            stringResource(R.string.hello_world_text),
+            color = colorResource(R.color.purple_700),
+            fontSize = 28.sp,
+            fontStyle = FontStyle.Italic,
+            fontWeight = FontWeight.ExtraBold
+        )
+        val gradientColors = listOf(Color.Cyan, Color.Blue, Color.Red)
+        Text(
+            stringResource(R.string.hello_world_text),
+            style = TextStyle(brush = Brush.linearGradient(colors = gradientColors))
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun pictureMod(){
+    Column (
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.Black)
+
+    ){
+        Image(
+            modifier = Modifier
+                .fillMaxWidth(),
+            painter = painterResource(R.drawable.android_logo),
+            contentDescription = "Logo Android",
+            contentScale = ContentScale.Crop
+        )
+    }
 }
