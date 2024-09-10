@@ -16,8 +16,16 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,6 +40,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -66,7 +75,9 @@ class MainActivity : ComponentActivity() {
                 Greeting(name = "World!")
             }*/
             Column(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment= androidx.compose.ui.Alignment.CenterHorizontally
 
@@ -81,6 +92,7 @@ class MainActivity : ComponentActivity() {
             }
             customText()
             pictureMod()
+            Content1()
 
         }
     }
@@ -181,5 +193,145 @@ fun pictureMod(){
             contentDescription = "Logo Android",
             contentScale = ContentScale.Crop
         )
+    }
+}
+@Preview(showBackground = true)
+@Composable
+fun Content1(){
+    Card(
+        modifier = Modifier
+            .background(Color.LightGray)
+            .fillMaxWidth()
+            .padding(5.dp)
+
+    ){
+        Text(text = "this is a title",
+        fontSize = 24.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier
+                      .padding (10.dp)
+                )
+        Image(
+            modifier = Modifier
+                .fillMaxWidth(),
+            painter = painterResource(id = R.drawable.android_logo),
+            contentDescription = "android logo",
+            contentScale = ContentScale.Crop
+        )
+
+
+
+
+        Text(
+            stringResource(R.string.text_card),
+            textAlign = TextAlign.Justify,
+            lineHeight  = 18.sp,
+            modifier = Modifier
+                .padding (10.dp)
+
+        )
+    }
+}
+@Preview(showBackground = true)
+@Composable
+fun content2() {
+
+    Card(modifier = Modifier
+        .background(Color.LightGray)
+        .fillMaxWidth()
+        .padding(5.dp)){
+        Row {
+            Image(
+                modifier = Modifier
+                    .width(60.dp)
+                    .height(100.dp)
+                    .padding(8.dp),
+                painter = painterResource(id = R.drawable.android_logo),
+                contentDescription = "Android Logo",
+                contentScale = ContentScale.Crop
+            )
+            Column {
+                Text(
+                    text = "This is a title",
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .padding(7.dp)
+                )
+
+
+
+                Text(
+                    stringResource(R.string.text_card),
+                    textAlign = TextAlign.Justify,
+                    lineHeight = 18.sp,
+                    fontSize = 10.sp,
+                    maxLines = 3,
+                    modifier = Modifier
+                        .padding(7.dp)
+
+                )
+            }
+
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun BoxExample1(){
+    Box(
+        modifier = Modifier
+            .background(Color.DarkGray)
+            .fillMaxWidth()
+            .padding(5.dp)
+    ){
+        Image(painterResource(R.drawable.android_logo),
+            contentDescription = "Android Head Logo",
+            contentScale = ContentScale.FillBounds)
+
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .padding(0.dp, 50.dp),
+            horizontalArrangement = Arrangement.Center) {
+
+            Icon(
+                Icons.Filled.AccountCircle,
+                contentDescription = "Icon Account"
+            )
+            Text( text = "text")
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun BoxExample2(){
+    Box(modifier = Modifier
+        .background(Color.Magenta)
+        .padding(5.dp)
+        .size(250.dp)){
+        Text(text = "TopStart",
+            Modifier.align(Alignment.TopStart))
+
+        Text(text = "TopEnd",
+            Modifier.align(Alignment.TopEnd))
+
+        Text(text = "CenterStart",
+            Modifier.align(Alignment.CenterStart))
+
+        Text(text = "Center",
+            Modifier.align(Alignment.Center))
+
+        Text(text = "CenterEnd",
+            Modifier.align(Alignment.CenterEnd))
+
+
+        Text(text = "BottomStart",
+            Modifier.align(Alignment.BottomStart))
+
+        Text(text = "BottomEnd",
+            Modifier.align(Alignment.BottomEnd))
+
     }
 }
