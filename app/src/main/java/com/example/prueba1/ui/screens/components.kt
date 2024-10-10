@@ -78,6 +78,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimeInput
 import androidx.compose.material3.TimePicker
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberTimePickerState
@@ -103,7 +104,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.navigation.NavController
-import com.example.ejemplo1.ui.components.PostCard
+import androidx.window.core.layout.WindowHeightSizeClass
+import androidx.window.core.layout.WindowWidthSizeClass
+import com.example.prueba1.ui.components.PostCard
+import com.example.prueba1.ui.components.PostCardCompact
 import com.example.prueba1.R
 import com.example.prueba1.data.model.MenuModel
 import com.example.prueba1.data.model.PostModel
@@ -128,6 +132,7 @@ fun ComponentsScreen(navController: NavController){
             MenuModel(1,"SnackBar","SnackBars", Icons.Filled.AccountBox),
             MenuModel(1,"Alert Dialogs","AlertDialogs", Icons.Filled.Lock),
             MenuModel(1,"Bars","Bars", Icons.Filled.Menu),
+            MenuModel(1,"Adaptive","Adaptive", Icons.Filled.Menu),
 
             )
         var component by rememberSaveable { mutableStateOf("") }//Es para hacer reactiva la variable commo en vue
@@ -352,6 +357,9 @@ fun ComponentsScreen(navController: NavController){
                     }
                     "Bars" -> {
                         Bars()
+                    }
+                    "Adaptive" -> {
+                        Adaptive()
                     }
                 }
             }
@@ -827,7 +835,6 @@ fun Bars(){
             PostModel(4,"title 7","text 7", painterResource(R.drawable.android_logo)),
             PostModel(4,"title 8","text 8", painterResource(R.drawable.android_logo)),
             PostModel(4,"title 9","text 9", painterResource(R.drawable.android_logo)),
-
             )
         Column(modifier = Modifier
             .align(Alignment.TopCenter)
@@ -895,7 +902,7 @@ fun Bars(){
 }
 
 @Composable
-fun Posts(arrayPosts:Array<PostModel> ){
+fun Posts(arrayPosts:Array<PostModel>, adaptive:String ){
     LazyColumn (
         modifier = Modifier
             .fillMaxWidth()
@@ -903,7 +910,14 @@ fun Posts(arrayPosts:Array<PostModel> ){
 
     ){
         items(arrayPosts){ post ->
-            PostCard(post.id, post.title, post.text, post.image)
+            when(adaptive){
+                "PhoneP" -> {
+                    PostCardCompact(post.id, post.title, post.text, post.image)
+                }
+                "PhoneL" -> {
+                    PostCard(post.id, post.title, post.text, post.image)
+                }
+            }
         }
     }
 }
@@ -920,5 +934,42 @@ fun PostsGrid(arrayPosts: Array<PostModel>){
         items(arrayPosts){ post ->
             PostCard(post.id, post.title, post.text, post.image)
         }
+    }
+}
+
+@Preview(showBackground = true, device = "spec:id=reference_tablet,shape=Normal,width=1280,height=800,unit=dp,dpi=240")
+@Composable
+fun Adaptive(){
+    var WindowsSize = currentWindowAdaptiveInfo().windowSizeClass
+    var height = currentWindowAdaptiveInfo().windowSizeClass.windowHeightSizeClass
+    var width = currentWindowAdaptiveInfo().windowSizeClass.windowWidthSizeClass
+
+    //Compact width < 600dp phone portrait
+    //Medium width >= 600dp < 840dp Tablets portrait
+    //Expanded width > 840dp Tablet landscape
+
+    // Compact height < 480dp Phone Landscape
+    //Medium height >= 480dp <900dp Tablet Landscape or phone portrait
+    //Expanded height > 900dp tablet in portrait
+
+    //Text(text = WindowsSize.toString())
+
+    var post = arrayOf(
+        PostModel(1,"title 1","text 1", painterResource(R.drawable.android_logo)),
+        PostModel(2,"title 2","text 2", painterResource(R.drawable.android_logo)),
+        PostModel(3,"title 3","text 3", painterResource(R.drawable.android_logo)),
+        PostModel(4,"title 4","text 4", painterResource(R.drawable.android_logo)),
+        PostModel(4,"title 5","text 5", painterResource(R.drawable.android_logo)),
+        PostModel(4,"title 6","text 6", painterResource(R.drawable.android_logo)),
+        PostModel(4,"title 7","text 7", painterResource(R.drawable.android_logo)),
+        PostModel(4,"title 8","text 8", painterResource(R.drawable.android_logo)),
+        PostModel(4,"title 9","text 9", painterResource(R.drawable.android_logo)),
+    )
+    if(width == WindowWidthSizeClass.COMPACT){
+        Posts(post, "PhoneP")
+    }else if (height == WindowHeightSizeClass.COMPACT){
+        Posts(post, "PhoneL")
+    } else{
+        Posts(post, "PhoneL")
     }
 }
