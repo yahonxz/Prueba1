@@ -15,16 +15,27 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBox
+import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Menu
@@ -67,6 +78,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimeInput
 import androidx.compose.material3.TimePicker
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberTimePickerState
@@ -75,11 +87,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.intl.Locale
@@ -89,7 +104,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.navigation.NavController
+import androidx.window.core.layout.WindowHeightSizeClass
+import androidx.window.core.layout.WindowWidthSizeClass
+import com.example.prueba1.ui.components.PostCard
+import com.example.prueba1.ui.components.PostCardCompact
 import com.example.prueba1.R
+import com.example.prueba1.data.model.MenuModel
 import com.example.prueba1.data.model.PostModel
 import kotlinx.coroutines.launch
 import java.util.Calendar
@@ -98,9 +118,27 @@ import java.util.Date
 @Composable
 fun ComponentsScreen(navController: NavController){
     Column {
-        var component by remember { mutableStateOf("") }//Es para hacer reactiva la variable commo en vue
+
+        var menuOptions = arrayOf(
+            MenuModel(1,"Buttons","Buttons", Icons.Filled.Email),
+            MenuModel(1,"Floating Buttons","FloatingButtons", Icons.Filled.AccountBox),
+            MenuModel(1,"Chips","Chips", Icons.Filled.Info),
+            MenuModel(1,"Progress","Progress", Icons.Filled.Build),
+            MenuModel(1,"Sliders","Sliders", Icons.Filled.Settings),
+            MenuModel(1,"Switches","Switches", Icons.Filled.Send),
+            MenuModel(1,"Badges","Badges", Icons.Filled.ThumbUp),
+            MenuModel(1,"Date Picker","DatePickers", Icons.Filled.DateRange),
+            MenuModel(1,"Time Picker","TimePickers", Icons.Filled.Info),
+            MenuModel(1,"SnackBar","SnackBars", Icons.Filled.AccountBox),
+            MenuModel(1,"Alert Dialogs","AlertDialogs", Icons.Filled.Lock),
+            MenuModel(1,"Bars","Bars", Icons.Filled.Menu),
+            MenuModel(1,"Adaptive","Adaptive", Icons.Filled.Menu),
+
+            )
+        var component by rememberSaveable { mutableStateOf("") }//Es para hacer reactiva la variable commo en vue
         val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
         val scope = rememberCoroutineScope()
+
         ModalNavigationDrawer(
             drawerState = drawerState,//Current state of drawer
             //Drawer content
@@ -108,18 +146,26 @@ fun ComponentsScreen(navController: NavController){
                 ModalDrawerSheet {
                     Text("Menu", modifier = Modifier.padding(16.dp))
                     HorizontalDivider()
-                    NavigationDrawerItem(
-                        label = { Text(text = "Content 1") },
-                        selected = false,
-                        onClick = {
-                            component = "Content1"
-                            scope.launch {
-                                drawerState.apply {
-                                    close()
+                    LazyColumn {
+                        items(menuOptions){item ->
+                            NavigationDrawerItem(
+                                icon = { Icon(item.icon, contentDescription = "") },
+                                label = { Text(text =  item.title)},
+                                selected = false,
+                                onClick = {
+                                    component = item.option
+                                    scope.launch {
+                                        drawerState.apply {
+                                            close()
+                                        }
+                                    }
                                 }
-                            }
+                            )
+
                         }
-                    )
+                    }
+                    /*
+
                     NavigationDrawerItem(
                         label = { Text(text = "Buttons") },
                         selected = false,
@@ -264,6 +310,7 @@ fun ComponentsScreen(navController: NavController){
                             }
                         }
                     )
+                    */
                 }
             }
         ) {
@@ -310,6 +357,9 @@ fun ComponentsScreen(navController: NavController){
                     }
                     "Bars" -> {
                         Bars()
+                    }
+                    "Adaptive" -> {
+                        Adaptive()
                     }
                 }
             }
@@ -776,18 +826,22 @@ fun Bars(){
             Icon(Icons.Filled.Settings, contentDescription = "", tint = Color.White)
         }
         var post = arrayOf(
-            PostModel(1,"title 1","text 1"),
-            PostModel(2,"title 2","text 2"),
-            PostModel(3,"title 3","text 3"),
-            PostModel(4,"title 4","text 4"),
-
-        )
+            PostModel(1,"title 1","text 1", painterResource(R.drawable.android_logo)),
+            PostModel(2,"title 2","text 2", painterResource(R.drawable.android_logo)),
+            PostModel(3,"title 3","text 3", painterResource(R.drawable.android_logo)),
+            PostModel(4,"title 4","text 4", painterResource(R.drawable.android_logo)),
+            PostModel(4,"title 5","text 5", painterResource(R.drawable.android_logo)),
+            PostModel(4,"title 6","text 6", painterResource(R.drawable.android_logo)),
+            PostModel(4,"title 7","text 7", painterResource(R.drawable.android_logo)),
+            PostModel(4,"title 8","text 8", painterResource(R.drawable.android_logo)),
+            PostModel(4,"title 9","text 9", painterResource(R.drawable.android_logo)),
+            )
         Column(modifier = Modifier
             .align(Alignment.TopCenter)
             .padding(10.dp,90.dp,10.dp,50.dp)
             .fillMaxSize()
         ) {
-            Posts(post)
+            PostsGrid(post)
         }
         Row(
             modifier = Modifier
@@ -848,24 +902,74 @@ fun Bars(){
 }
 
 @Composable
-fun Posts(arrayPosts:Array<PostModel> ){
+fun Posts(arrayPosts:Array<PostModel>, adaptive:String ){
     LazyColumn (
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(26.dp)
 
     ){
-       items(arrayPosts){ post ->
-           Text(
-               text = post.text,
-               color = Color.White,
-               fontSize = 16.sp
-           )
-           Spacer(modifier = Modifier.height(16.dp))
-           HorizontalDivider(thickness = 2.dp)
-       }
+        items(arrayPosts){ post ->
+            when(adaptive){
+                "PhoneP" -> {
+                    PostCardCompact(post.id, post.title, post.text, post.image)
+                }
+                "PhoneL" -> {
+                    PostCard(post.id, post.title, post.text, post.image)
+                }
+            }
+        }
     }
 }
 
+@Composable
+fun PostsGrid(arrayPosts: Array<PostModel>){
+    LazyVerticalGrid(
+        columns = GridCells.Adaptive(minSize = 128.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(26.dp)
 
+    ){
+        items(arrayPosts){ post ->
+            PostCard(post.id, post.title, post.text, post.image)
+        }
+    }
+}
 
+@Preview(showBackground = true, device = "spec:id=reference_tablet,shape=Normal,width=1280,height=800,unit=dp,dpi=240")
+@Composable
+fun Adaptive(){
+    var WindowsSize = currentWindowAdaptiveInfo().windowSizeClass
+    var height = currentWindowAdaptiveInfo().windowSizeClass.windowHeightSizeClass
+    var width = currentWindowAdaptiveInfo().windowSizeClass.windowWidthSizeClass
+
+    //Compact width < 600dp phone portrait
+    //Medium width >= 600dp < 840dp Tablets portrait
+    //Expanded width > 840dp Tablet landscape
+
+    // Compact height < 480dp Phone Landscape
+    //Medium height >= 480dp <900dp Tablet Landscape or phone portrait
+    //Expanded height > 900dp tablet in portrait
+
+    //Text(text = WindowsSize.toString())
+
+    var post = arrayOf(
+        PostModel(1,"title 1","text 1", painterResource(R.drawable.android_logo)),
+        PostModel(2,"title 2","text 2", painterResource(R.drawable.android_logo)),
+        PostModel(3,"title 3","text 3", painterResource(R.drawable.android_logo)),
+        PostModel(4,"title 4","text 4", painterResource(R.drawable.android_logo)),
+        PostModel(4,"title 5","text 5", painterResource(R.drawable.android_logo)),
+        PostModel(4,"title 6","text 6", painterResource(R.drawable.android_logo)),
+        PostModel(4,"title 7","text 7", painterResource(R.drawable.android_logo)),
+        PostModel(4,"title 8","text 8", painterResource(R.drawable.android_logo)),
+        PostModel(4,"title 9","text 9", painterResource(R.drawable.android_logo)),
+    )
+    if(width == WindowWidthSizeClass.COMPACT){
+        Posts(post, "PhoneP")
+    }else if (height == WindowHeightSizeClass.COMPACT){
+        Posts(post, "PhoneL")
+    } else{
+        Posts(post, "PhoneL")
+    }
+}
