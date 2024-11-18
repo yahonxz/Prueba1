@@ -43,6 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -67,6 +68,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.prueba1.ui.background.CustomWorker
 import com.example.prueba1.ui.biometrics.BiometricsScreen
+import com.example.prueba1.ui.camera.CameraScreen
 import com.example.prueba1.ui.contacts.ContactScreen
 import com.example.prueba1.ui.location.viewModel.SearchViewModel
 import com.example.prueba1.ui.location.views.HomeView
@@ -386,7 +388,8 @@ fun ComposeMultiScreenApp(searchVM: SearchViewModel, activity: AppCompatActivity
 
 @Composable
 fun SetupNavGraph( navController: NavHostController,searchVM: SearchViewModel,activity: AppCompatActivity){
-    NavHost(navController = navController, startDestination = "biometrics" ){
+    val context = LocalContext.current
+    NavHost(navController = navController, startDestination = "Camera" ){
         composable ("menu"){MenuScreen(navController)}
         composable ("home"){ HomeScreen(navController) }
         composable ("login"){ LoginScreen(navController) }
@@ -408,5 +411,6 @@ fun SetupNavGraph( navController: NavHostController,searchVM: SearchViewModel,ac
         composable("contacts"){ ContactScreen(navController = navController) }
         //Biometricos
         composable("biometrics"){ BiometricsScreen(navController = navController, activity = activity)}
+        composable("Camera"){ CameraScreen(context = context)}
     }
 }
