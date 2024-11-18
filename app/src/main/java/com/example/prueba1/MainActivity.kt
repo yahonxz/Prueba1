@@ -2,9 +2,15 @@ package com.example.prueba1
 
 import android.graphics.Picture
 import android.os.Bundle
+import android.os.Build
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
+import androidx.work.BackoffPolicy
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -43,6 +49,9 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import dagger.hilt.android.AndroidEntryPoint
+import java.time.Duration
+import java.util.concurrent.TimeUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -52,6 +61,7 @@ import com.example.prueba1.ui.theme.Prueba1Theme
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.prueba1.ui.background.CustomWorker
 import com.example.prueba1.ui.screens.ComponentsScreen
 import com.example.prueba1.ui.screens.HomeScreen
 import com.example.prueba1.ui.screens.LoginScreen
@@ -59,10 +69,22 @@ import com.example.prueba1.ui.screens.MenuScreen
 
 //import androidx.navigation.compose.NavHostController
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        //WorkManager
+        val workRequest = OneTimeWorkRequestBuilder<CustomWorker>()
+            .setInitialDelay(Duration.ofSeconds(10))
+            .setBackoffCriteria(
+                backoffPolicy = BackoffPolicy.LINEAR,
+                duration = Duration.ofSeconds(15)
+            )
+            .build()
+        WorkManager.getInstance(applicationContext).enqueue(workRequest)
+        //Se enviara el mensaje al logcat
         setContent {
             /*
             //Layouts
