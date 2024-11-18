@@ -16,6 +16,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -47,11 +49,12 @@ fun ContactScreen(navController: NavController){
             )
         )
     }
-    // Verifica si los permisos han sido otorgados para mostrar la pantalla correspondiente
+    Button(onClick = {navController.popBackStack()}){
+        Icon(Icons.Filled.KeyboardArrowLeft,"Go Back")
+    }
     if (hasPermission) {
         AgendaScreen()
     } else {
-        // Muestra un mensaje y un botón si los permisos no fueron concedidos
         Column(
             modifier = Modifier
                 .fillMaxSize()

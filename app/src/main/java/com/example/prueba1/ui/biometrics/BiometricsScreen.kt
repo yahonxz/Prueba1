@@ -12,7 +12,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -68,6 +71,9 @@ fun BiometricsScreen(navController: NavController,activity:AppCompatActivity){
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ){
+            Button(onClick = {navController.popBackStack()}){
+                Icon(Icons.Filled.KeyboardArrowLeft,"Go Back")
+            }
             //Simple button
             Button(onClick = {
                 promptManager.showBiometricPrompt(

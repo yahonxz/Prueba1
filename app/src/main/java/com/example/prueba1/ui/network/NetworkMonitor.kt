@@ -9,10 +9,15 @@ import android.net.wifi.WifiInfo
 import android.net.wifi.WifiManager
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import androidx.navigation.NavController
 import com.example.prueba1.MainActivity
 import kotlinx.coroutines.delay
 
@@ -72,7 +78,7 @@ class NetworkMonitor(
 
     // Composable que muestra la pantalla de monitoreo de la red
     @Composable
-    fun NetworkMonitorScreen() {
+    fun NetworkMonitorScreen(navController: NavController) {
         // Variables para almacenar el estado de la conexión y el uso de datos
         var connectionStatus by remember { mutableStateOf("Sin conexión a Internet") }
         var mobileDataUsage by remember { mutableStateOf(0L) }
@@ -131,17 +137,25 @@ class NetworkMonitor(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
-            // Si tenemos conexión, mostramos la imagen de acuerdo a la calidad de la red
-            if (connectionStatus != "Sin conexión a Internet") {
-                NetworkImage(isHighQualityImage)
-            } else {
-                // Si no hay conexión, mostramos un mensaje
-                Text(
-                    "Sin conexión para cargar la imagen",
-                    fontSize = 18.sp,
-                    color = MaterialTheme.colorScheme.error
-                )
+            Row(){
+
+                Button(onClick = {navController.popBackStack()}){
+                    Icon(Icons.Filled.KeyboardArrowLeft,"Go Back")
+                }
+
+                // Si tenemos conexión, mostramos la imagen de acuerdo a la calidad de la red
+                if (connectionStatus != "Sin conexión a Internet") {
+                    NetworkImage(isHighQualityImage)
+                } else {
+                    // Si no hay conexión, mostramos un mensaje
+                    Text(
+                        "Sin conexión para cargar la imagen",
+                        fontSize = 18.sp,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
             }
+
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -151,6 +165,8 @@ class NetworkMonitor(
             ConnectionCard("Consumo de Datos Móviles", "${mobileDataUsage / (1024 * 1024)} MB")
             Spacer(modifier = Modifier.height(16.dp))
             ConnectionCard("Consumo de Datos WiFi", "${wifiDataUsage / (1024 * 1024)} MB")
+
+
         }
     }
 }
