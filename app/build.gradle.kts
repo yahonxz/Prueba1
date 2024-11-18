@@ -64,6 +64,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.adaptive.android)
+    implementation(libs.androidx.appcompat)
     //implementation(libs.androidx.navigation.runtime.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -89,4 +90,6 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     //Places
     implementation("com.google.android.libraries.places:places:4.0.0")
+    // Biometrics
+    implementation("androidx.biometric:biometric:1.1.0")
 }
