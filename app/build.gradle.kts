@@ -92,4 +92,7 @@ dependencies {
     implementation("com.google.android.libraries.places:places:4.0.0")
     // Biometrics
     implementation("androidx.biometric:biometric:1.1.0")
+    //Camera and files
+    //implementation("io.coil-kt:coil-compose:2.0.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
 }
