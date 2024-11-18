@@ -32,6 +32,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
+import androidx.activity.viewModels
+import androidx.navigation.NavType
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -61,7 +63,11 @@ import com.example.prueba1.ui.theme.Prueba1Theme
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.prueba1.ui.background.CustomWorker
+import com.example.prueba1.ui.location.viewModel.SearchViewModel
+import com.example.prueba1.ui.location.views.HomeView
+import com.example.prueba1.ui.location.views.MapsSearchView
 import com.example.prueba1.ui.screens.ComponentsScreen
 import com.example.prueba1.ui.screens.HomeScreen
 import com.example.prueba1.ui.screens.LoginScreen
@@ -85,7 +91,11 @@ class MainActivity : ComponentActivity() {
             .build()
         WorkManager.getInstance(applicationContext).enqueue(workRequest)
         //Se enviara el mensaje al logcat
+        //Maps
+        //Instancia del ViewModel
+        val viewModel: SearchViewModel by viewModels()
         setContent {
+            ComposeMultiScreenApp(searchVM = viewModel)
             /*
             //Layouts
            /* Column {
@@ -130,7 +140,7 @@ class MainActivity : ComponentActivity() {
             pictureMod()
             Content1()
 */
-            ComposeMultiScreenApp()
+
         }
     }
 }
@@ -361,23 +371,35 @@ fun BoxExample2(){
 
 * */
 
-@Preview(showBackground = true)
 @Composable
-fun ComposeMultiScreenApp(){
+fun ComposeMultiScreenApp(searchVM: SearchViewModel){
     val navController =rememberNavController()
     Surface (color = Color.White){
-        SetupNavGraph (navController =navController)
+        SetupNavGraph (navController =navController,searchVM)
 
     }
         
     }
 
 @Composable
-fun SetupNavGraph( navController: NavHostController){
-    NavHost(navController = navController, startDestination = "login" ){
+fun SetupNavGraph( navController: NavHostController,searchVM: SearchViewModel){
+    NavHost(navController = navController, startDestination = "homeMaps" ){
         composable ("menu"){MenuScreen(navController)}
         composable ("home"){ HomeScreen(navController) }
         composable ("login"){ LoginScreen(navController) }
         composable("components") { ComponentsScreen(navController) }
+        // Ruta para `MapsSearchView` que recibe latitud, longitud y dirección como argumentos
+        composable("homeMaps"){ HomeView(navController = navController, searchVM = searchVM)}
+        composable("MapsSearchView/{lat}/{long}/{address}", arguments = listOf(
+            navArgument("lat") { type = NavType.FloatType },
+            navArgument("long") { type = NavType.FloatType },
+            navArgument("address") { type = NavType.StringType }
+        )) {
+            // Obtención de los argumentos con valores predeterminados en caso de que falten
+            val lat = it.arguments?.getFloat("lat") ?: 0.0
+            val long = it.arguments?.getFloat("long") ?: 0.0
+            val address = it.arguments?.getString("address") ?: ""
+            MapsSearchView(lat.toDouble(), long.toDouble(), address )
+        }
     }
 }
