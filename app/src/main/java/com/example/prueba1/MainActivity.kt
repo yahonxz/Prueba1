@@ -65,6 +65,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.prueba1.ui.background.CustomWorker
+import com.example.prueba1.ui.contacts.ContactScreen
 import com.example.prueba1.ui.location.viewModel.SearchViewModel
 import com.example.prueba1.ui.location.views.HomeView
 import com.example.prueba1.ui.location.views.MapsSearchView
@@ -383,7 +384,7 @@ fun ComposeMultiScreenApp(searchVM: SearchViewModel){
 
 @Composable
 fun SetupNavGraph( navController: NavHostController,searchVM: SearchViewModel){
-    NavHost(navController = navController, startDestination = "homeMaps" ){
+    NavHost(navController = navController, startDestination = "contacts" ){
         composable ("menu"){MenuScreen(navController)}
         composable ("home"){ HomeScreen(navController) }
         composable ("login"){ LoginScreen(navController) }
@@ -401,5 +402,7 @@ fun SetupNavGraph( navController: NavHostController,searchVM: SearchViewModel){
             val address = it.arguments?.getString("address") ?: ""
             MapsSearchView(lat.toDouble(), long.toDouble(), address )
         }
+        // Contactos
+        composable("contacts"){ ContactScreen(navController = navController) }
     }
 }
