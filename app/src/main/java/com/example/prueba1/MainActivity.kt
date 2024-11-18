@@ -439,13 +439,13 @@ fun ComposeMultiScreenApp(searchVM: SearchViewModel, activity: AppCompatActivity
 @Composable
 fun SetupNavGraph( navController: NavHostController,searchVM: SearchViewModel,activity: AppCompatActivity,networkMonitor: NetworkMonitor){
     val context = LocalContext.current
-    NavHost(navController = navController, startDestination = "internet" ){
+    NavHost(navController = navController, startDestination = "menu" ){
         composable ("menu"){MenuScreen(navController)}
         composable ("home"){ HomeScreen(navController) }
         composable ("login"){ LoginScreen(navController) }
         composable("components") { ComponentsScreen(navController) }
         //Internet
-        composable("internet"){networkMonitor.NetworkMonitorScreen()}
+        composable("internet"){networkMonitor.NetworkMonitorScreen(navController)}
         // Ruta para `MapsSearchView` que recibe latitud, longitud y dirección como argumentos
         composable("homeMaps"){ HomeView(navController = navController, searchVM = searchVM)}
         composable("MapsSearchView/{lat}/{long}/{address}", arguments = listOf(
@@ -463,6 +463,6 @@ fun SetupNavGraph( navController: NavHostController,searchVM: SearchViewModel,ac
         composable("contacts"){ ContactScreen(navController = navController) }
         //Biometricos
         composable("biometrics"){ BiometricsScreen(navController = navController, activity = activity)}
-        composable("Camera"){ CameraScreen(context = context)}
+        composable("Camera"){ CameraScreen(context = context,navController)}
     }
 }
