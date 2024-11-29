@@ -56,7 +56,7 @@ fun ServiceDetailCard(
                     .width(100.dp)
                     .height(100.dp),
                 model = imageURL,
-                error = painterResource(id = R.drawable.ic_launcher_background),
+                error = painterResource(id = R.drawable.ic_launcher_foreground),
                 contentDescription = "Service logo",
                 contentScale = ContentScale.FillBounds
             )

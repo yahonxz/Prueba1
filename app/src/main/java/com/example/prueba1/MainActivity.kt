@@ -2,18 +2,14 @@ package com.example.prueba1
 
 import android.graphics.Picture
 import android.os.Bundle
-import android.os.Build
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.ui.platform.LocalContext
 import android.net.ConnectivityManager
 import android.net.wifi.WifiManager
-import androidx.annotation.RequiresApi
-import androidx.work.BackoffPolicy
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.appcompat.app.AppCompatActivity
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -33,10 +29,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
-import androidx.activity.viewModels
-import androidx.navigation.NavType
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -45,7 +40,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -55,36 +49,45 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import dagger.hilt.android.AndroidEntryPoint
-import java.time.Duration
-import java.util.concurrent.TimeUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.NavDestination
+import androidx.navigation.NavHost
 import androidx.navigation.NavHostController
 import com.example.prueba1.ui.theme.Prueba1Theme
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-import com.example.prueba1.ui.background.CustomWorker
 import com.example.prueba1.ui.biometrics.BiometricsScreen
 import com.example.prueba1.ui.camera.CameraScreen
 import com.example.prueba1.ui.contacts.ContactScreen
-import com.example.prueba1.ui.location.viewModel.SearchViewModel
-import com.example.prueba1.ui.location.views.HomeView
-import com.example.prueba1.ui.location.views.MapsSearchView
 import com.example.prueba1.ui.screens.ComponentsScreen
 import com.example.prueba1.ui.screens.HomeScreen
 import com.example.prueba1.ui.screens.LoginScreen
 import com.example.prueba1.ui.screens.MenuScreen
 import android.Manifest
 import android.content.pm.PackageManager
+import android.os.Build
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
+import com.example.prueba1.ui.background.CustomWorker
+import com.example.prueba1.ui.location.viewModel.SearchViewModel
+import com.example.prueba1.ui.location.views.HomeView
+import com.example.prueba1.ui.location.views.MapsSearchView
 import com.example.prueba1.ui.network.NetworkMonitor
+import dagger.hilt.android.AndroidEntryPoint
+import androidx.work.BackoffPolicy
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import com.example.prueba1.ui.screens.ManageServiceScreen
+import java.time.Duration
+import java.util.concurrent.TimeUnit
 
 //import androidx.navigation.compose.NavHostController
 
@@ -95,11 +98,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var wifiManager: WifiManager  // Para gestionar el Wi-Fi
     private lateinit var connectivityManager: ConnectivityManager  // Para gestionar las conexiones de red
     private lateinit var networkMonitor: NetworkMonitor  // Clase que monitorea el estado de la red
+    //--------------------------------------------
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         //WorkManager
+        //------------------------------------------
         val workRequest = OneTimeWorkRequestBuilder<CustomWorker>()
             .setInitialDelay(Duration.ofSeconds(10))
             .setBackoffCriteria(
@@ -108,7 +114,7 @@ class MainActivity : AppCompatActivity() {
             )
             .build()
         WorkManager.getInstance(applicationContext).enqueue(workRequest)
-        //Se enviara el mensaje al logcat
+        //By adding this, message "Hello from worker!" should be seen from LogCat
         //Internet
         // Obtenemos los servicios necesarios para controlar Wi-Fi y la conectividad de red
         wifiManager = getSystemService(WIFI_SERVICE) as WifiManager
@@ -121,8 +127,19 @@ class MainActivity : AppCompatActivity() {
         setContent {
             ComposeMultiScreenApp(searchVM = viewModel,this,networkMonitor)
             /*
+            Column(
+                modifier = Modifier.fillMaxSize()
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
+            ){
+                Text(text = "simple text")
+                ModifierExample()
+                ModifierExample2()
+                ModifierExample3()
+            }
             //Layouts
-           /* Column {
+            /*Column {
                 //Los pone en filas
                 Text(text = "First Row")
                 Text(text = "Second Row")
@@ -144,31 +161,16 @@ class MainActivity : AppCompatActivity() {
 
                 Greeting(name = "World!")
             }*/
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment= androidx.compose.ui.Alignment.CenterHorizontally
-
-
-            ){
-                Text(text = "simple text")
-                ModifierExample2()
-                ModifierExample2()
-                ModifierExample3()
-
-
-            }
             customText()
-            pictureMod()
-            Content1()
-*/
-
+            picture()
+            content1()
+            */
         }
     }
     //Internet
 // Función para solicitar permisos si no han sido concedidos
+
+
     fun requestPermissionsIfNeeded() {
         val permissions = listOf(
             Manifest.permission.ACCESS_FINE_LOCATION,  // Permiso para la ubicación precisa
@@ -183,6 +185,7 @@ class MainActivity : AppCompatActivity() {
             requestPermissionsLauncher.launch(permissions.toTypedArray())
         }
     }
+
     private val requestPermissionsLauncher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions())
         { permissions ->
@@ -197,6 +200,7 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "Permisos necesarios no concedidos", Toast.LENGTH_SHORT).show()
             }
         }
+
 }
 
 /*
@@ -212,45 +216,48 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 @Composable
 fun GreetingPreview() {
     Prueba1Theme {
-        Greeting("Caro")
+        Greeting("Jorge")
     }
 }
 
 @Composable
-fun  ModifierExample2(){
+fun ModifierExample(){
+    Column(
+        modifier = Modifier
+            .padding(24.dp)
+    ) {
+Text(text = "Hello world")
+    }
+}
 
-    Column (
+@Composable
+fun ModifierExample2(){
+    Column(
         modifier = Modifier
             .padding(24.dp)
             .fillMaxWidth()
-            .clickable(onClick = { clickAction() })
-
-    ){
-        Text(text = "hello world")
+            .clickable(onClick = {clickAction()})
+    ) {
+        Text(text = "Hello world")
     }
-
-
 }
 
-fun clickAction() {
-    println("Colum clicked")
+fun clickAction(){
+    println("Column Clicked")
 }
-
 
 @Composable
-fun  ModifierExample3(){
-
-    Column (
-     modifier = Modifier
-         .fillMaxHeight()
-         .padding(16.dp)
-         .background(Color.Blue)
-         .border(width = 2.dp, color = Color.Green)
-         .width(200.dp),
-
+fun ModifierExample3(){
+    Column(
+        modifier = Modifier
+            .fillMaxHeight()
+            .padding(16.dp)
+            .background(Color.Cyan)
+            .border(width = 2.dp, color = Color.Magenta)
+            .width(200.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceEvenly
-    ){
+    ) {
         Text(text = "item 1")
         Text(text = "item 2")
         Text(text = "item 3")
@@ -258,9 +265,8 @@ fun  ModifierExample3(){
         Text(text = "item 5")
     }
 
-
 }
-@Preview(showBackground = true)
+
 @Composable
 fun customText(){
     Column {
@@ -279,9 +285,8 @@ fun customText(){
     }
 }
 
-@Preview(showBackground = true)
 @Composable
-fun pictureMod(){
+fun picture(){
     Column (
         modifier = Modifier
             .fillMaxWidth()
@@ -299,16 +304,12 @@ fun pictureMod(){
 }
 
 @Composable
-fun Content1() {
-    Card(
-        modifier = Modifier
-            .background(Color.LightGray)
-            .fillMaxWidth()
-            .padding(5.dp)
-
-    ) {
-        Text(
-            text = "this is a title",
+fun content1(){
+    Card(modifier = Modifier
+        .background(Color.LightGray)
+        .fillMaxWidth()
+        .padding(5.dp)){
+        Text(text = "This is a title",
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier
@@ -318,13 +319,18 @@ fun Content1() {
             modifier = Modifier
                 .fillMaxWidth(),
             painter = painterResource(id = R.drawable.android_logo),
-            contentDescription = "android logo",
-            contentScale = ContentScale.Crop
+            contentDescription = "Android Logo",
+            contentScale = ContentScale.Crop)
+        Text(
+            stringResource(R.string.text_card),
+            textAlign = TextAlign.Justify,
+            lineHeight = 18.sp,
+            modifier = Modifier
+                .padding(10.dp)
         )
     }
 }
 
-@Preview(showBackground = true)
 @Composable
 fun content2() {
 
@@ -343,13 +349,13 @@ fun content2() {
                 contentScale = ContentScale.Crop
             )
             Column {
-                Text(
-                    text = "This is a title",
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                        .padding(7.dp)
-                )
+            Text(
+                text = "This is a title",
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .padding(7.dp)
+            )
 
 
 
@@ -366,8 +372,10 @@ fun content2() {
             }
 
         }
+    }
+}
 
-        @Preview(showBackground = true)
+@Preview(showBackground = true)
 @Composable
 fun BoxExample1(){
     Box(
@@ -422,30 +430,40 @@ fun BoxExample2(){
 
         Text(text = "BottomEnd",
             Modifier.align(Alignment.BottomEnd))
-            }}
 
-* */
+    }
+}
+*/
 
 @Composable
 fun ComposeMultiScreenApp(searchVM: SearchViewModel, activity: AppCompatActivity,networkMonitor: NetworkMonitor){
-    val navController =rememberNavController()
-    Surface (color = Color.White){
-        SetupNavGraph (navController =navController,searchVM,activity,networkMonitor)
-
+    val navController = rememberNavController()
+    Surface(color=Color.White){
+        SetupNavGraph(navController=navController,searchVM,activity,networkMonitor) //función propia //crea el grafo recordando el navcontroller donde nos encontramos
     }
-        
-    }
+}
 
 @Composable
-fun SetupNavGraph( navController: NavHostController,searchVM: SearchViewModel,activity: AppCompatActivity,networkMonitor: NetworkMonitor){
+fun SetupNavGraph(navController: NavHostController, searchVM: SearchViewModel, activity: AppCompatActivity, networkMonitor: NetworkMonitor){
+
     val context = LocalContext.current
-    NavHost(navController = navController, startDestination = "menu" ){
-        composable ("menu"){MenuScreen(navController)}
-        composable ("home"){ HomeScreen(navController) }
-        composable ("login"){ LoginScreen(navController) }
-        composable("components") { ComponentsScreen(navController) }
-        //Internet
+    NavHost(navController = navController, startDestination = "menu"){ //índice de pantallas //Usa el nav controller de ahorita y empieza desde el índice definido
+        composable("menu"){ MenuScreen(navController) } //Rutas
+        composable("home"){ HomeScreen(navController) }
+        composable("components"){ ComponentsScreen(navController) }
+        composable("login"){ LoginScreen(navController = navController)}
+
+        composable("Camera"){ CameraScreen(context = context,navController)}
+
         composable("internet"){networkMonitor.NetworkMonitorScreen(navController)}
+
+        // Rutas de contactos
+
+        composable("contacts"){ ContactScreen(navController = navController) }
+
+        //Biometricos
+        composable("biometrics"){ BiometricsScreen(navController = navController, activity = activity)}
+
         // Ruta para `MapsSearchView` que recibe latitud, longitud y dirección como argumentos
         composable("homeMaps"){ HomeView(navController = navController, searchVM = searchVM)}
         composable("MapsSearchView/{lat}/{long}/{address}", arguments = listOf(
@@ -459,10 +477,11 @@ fun SetupNavGraph( navController: NavHostController,searchVM: SearchViewModel,ac
             val address = it.arguments?.getString("address") ?: ""
             MapsSearchView(lat.toDouble(), long.toDouble(), address )
         }
-        // Contactos
-        composable("contacts"){ ContactScreen(navController = navController) }
-        //Biometricos
-        composable("biometrics"){ BiometricsScreen(navController = navController, activity = activity)}
-        composable("Camera"){ CameraScreen(context = context,navController)}
+        //API SERVICES
+        composable("manage-service/{serviceId}"){backStackEntry ->
+            val serviceId = backStackEntry.arguments?.getString("serviceId")
+            ManageServiceScreen(navController, serviceId = serviceId)
+        }
     }
+
 }
