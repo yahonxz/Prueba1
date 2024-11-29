@@ -102,4 +102,14 @@ dependencies {
     implementation("androidx.activity:activity-compose:1.9.3")
     debugImplementation("androidx.compose.ui:ui-tooling:1.7.5")
     //implementation("io.coil-kt:coil-compose:2.4.0")
+    //API
+    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0")
+    //implementation("com.squareup.retrofit2:retrofit:2.9.0") //Está en WorkManager
+    implementation("com.squareup.okhttp3:okhttp:4.11.0")
+    //implementation("io.coil-kt:coil-compose:2.4.0") //Está en BioMe
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+    //implementation("com.squareup.retrofit2:converter-gson:2.9.0") // Está en WorkManager
+
+
 }
+
