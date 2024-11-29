@@ -26,14 +26,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.prueba1.R
 import com.example.prueba1.data.controller.ServiceViewModel
 import com.example.prueba1.data.model.ServiceModel
 import com.example.prueba1.ui.components.TopBar
-
 @Composable
 fun ManageServiceScreen(
     navController : NavController,
