@@ -38,8 +38,9 @@ import com.example.prueba1.data.model.ServiceModel
 import com.example.prueba1.ui.components.ServiceCard
 import com.example.prueba1.ui.components.ServiceDetailCard
 import com.example.prueba1.ui.components.TopBar
-import com.example.prueba1.ui.components.ServiceDetailCard
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -51,7 +52,7 @@ fun HomeScreen (navController: NavController, viewModel: ServiceViewModel = andr
 
     var services by remember { mutableStateOf<List<ServiceEntity>>(emptyList())}
 
-    var serviceDetail by remember { mutableStateOf<ServiceModel?>(null) }
+    var serviceDetail by remember { mutableStateOf<ServiceEntity?>(null) }
     var sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = false
     )
@@ -96,11 +97,16 @@ fun HomeScreen (navController: NavController, viewModel: ServiceViewModel = andr
             items(services){ service ->
                 ServiceCard(service.id, service.name , service.username, service.imageURL,
                     onButtonClick = {
-                        viewModel.showService(service.id){ response ->
-                            if(response.isSuccessful){
-                                serviceDetail = response.body()
-                            }
+                        CoroutineScope(Dispatchers.IO).launch {
+                            serviceDetail = serviceDao.show(service.id.toInt())
+
                         }
+
+//                        viewModel.showService(service.id){ response ->
+//                            if(response.isSuccessful){
+//                                serviceDetail = response.body()
+//                            }
+//                        }
                         showBottomSheet=true
                     }
                 )

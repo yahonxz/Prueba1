@@ -35,6 +35,7 @@ import com.example.prueba1.data.dao.ServiceDao
 import com.example.prueba1.data.database.AppDatabase
 import com.example.prueba1.data.database.DatabaseProvider
 import com.example.prueba1.data.model.ServiceModel
+import com.example.prueba1.data.model.toServiceEntity
 import com.example.prueba1.ui.components.TopBar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -176,7 +177,7 @@ fun ManageServiceScreen(
                         password = service.value.password,
                         description = service.value.description
                     )
-                    save(viewModel, context, serviceTemp, serviceId)
+                    save(viewModel, context, serviceTemp, serviceId, db)
                 }
             ) {
                 Text(if (serviceId == "0") "CREATE SERVICE" else "SAVE CHANGES")
@@ -211,39 +212,66 @@ fun save(
     viewModel: ServiceViewModel,
     context: Context,
     service: ServiceModel,
-    serviceId: String?
+    serviceId: String?,
+    db: AppDatabase
 ) {
     if (serviceId == "0") {
-        viewModel.createService(service) { response ->
-            if (response.isSuccessful) {
-                Toast.makeText(
-                    context,
-                    "Service created successfully",
-                    Toast.LENGTH_SHORT
-                ).show()
-            } else {
-                Toast.makeText(
-                    context,
-                    "Error: $${response.body()}",
-                    Toast.LENGTH_SHORT
-                ).show()
+        val serviceDao = db.serviceDao()
+        var lastID = -1
+
+        try {
+            CoroutineScope(Dispatchers.IO).launch {
+                lastID = serviceDao.lastId()
+                service.id = lastID + 1
+                serviceDao.insert(service.toServiceEntity())
             }
+            viewModel.createService(service) { response ->
+                if (response.isSuccessful) {
+                    Toast.makeText(
+                        context,
+                        "Service created successfully",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    Toast.makeText(
+                        context,
+                        "Error: $${response.body()}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        } catch (exception: Exception) {
+            println(exception)
         }
+
+
+
+//
     } else if (serviceId != null) {
-        viewModel.updateService(serviceId.toInt(), service) { response ->
-            if (response.isSuccessful) {
-                Toast.makeText(
-                    context,
-                    "Service updated successfully",
-                    Toast.LENGTH_SHORT
-                ).show()
-            } else {
-                Toast.makeText(
-                    context,
-                    "Error: $${response.body()}",
-                    Toast.LENGTH_SHORT
-                ).show()
+        val serviceDao = db.serviceDao()
+
+        try {
+            CoroutineScope(Dispatchers.IO).launch {
+                service.id = serviceId.toInt()
+                serviceDao.insert(service.toServiceEntity())
             }
+            viewModel.updateService(serviceId.toInt(), service) { response ->
+                if (response.isSuccessful) {
+                    Toast.makeText(
+                        context,
+                        "Service updated successfully",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    Toast.makeText(
+                        context,
+                        "Error: $${response.body()}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        } catch (exception: Exception) {
+            println(exception)
         }
     }
 }
@@ -255,30 +283,33 @@ fun delete(
     navController: NavController,
     serviceDao: ServiceDao
 ) {
+
     if (serviceId != null && serviceId != "0") {
-        viewModel.deleteService(serviceId.toInt()) { response ->
-            if (response.isSuccessful) {
-
-                //
-                CoroutineScope(Dispatchers.IO).launch {
-                    val service = serviceDao.show(serviceId.toInt())
-                    serviceDao.delete(service)
-                }
-                //
-
-                Toast.makeText(
-                    context,
-                    "Service deleted successfully",
-                    Toast.LENGTH_SHORT
-                ).show()
-                navController.popBackStack()
-            } else {
-                Toast.makeText(
-                    context,
-                    "Failed to delete service",
-                    Toast.LENGTH_SHORT
-                ).show()
+        try{
+            CoroutineScope(Dispatchers.IO).launch {
+                val service = serviceDao.show(serviceId.toInt())
+                serviceDao.delete(service)
             }
+
+            viewModel.deleteService(serviceId.toInt()) { response ->
+                if (response.isSuccessful) {
+                    Toast.makeText(
+                        context,
+                        "Service deleted successfully",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    navController.popBackStack()
+                } else {
+                    Toast.makeText(
+                        context,
+                        "Failed to delete service",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        } catch (exception: Exception) {
+            println(exception)
         }
+
     }
 }
