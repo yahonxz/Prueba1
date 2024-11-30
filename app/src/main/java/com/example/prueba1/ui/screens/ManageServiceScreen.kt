@@ -26,21 +26,33 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.prueba1.R
 import com.example.prueba1.data.controller.ServiceViewModel
+import com.example.prueba1.data.dao.ServiceDao
+import com.example.prueba1.data.database.AppDatabase
+import com.example.prueba1.data.database.DatabaseProvider
 import com.example.prueba1.data.model.ServiceModel
 import com.example.prueba1.ui.components.TopBar
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+
+
 @Composable
 fun ManageServiceScreen(
     navController : NavController,
     serviceId: String?,
     viewModel: ServiceViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ){
+    val db: AppDatabase = DatabaseProvider.getDatabase(LocalContext.current)
+    val serviceDao = db.serviceDao()
     val service = remember {mutableStateOf(ServiceModel())}
     val context = LocalContext.current
     var bar_title by remember {mutableStateOf("Create new service")}
+
     if(serviceId != null && serviceId != "0"){
         bar_title = "Update service"
         viewModel.showService(serviceId.toInt()){ response ->
@@ -58,6 +70,7 @@ fun ManageServiceScreen(
             }
         }
     }
+
     Scaffold(
         topBar = {TopBar(bar_title, navController, true)},
     ){ innerPadding ->
@@ -68,6 +81,7 @@ fun ManageServiceScreen(
                 .padding(innerPadding)
         ){
             Spacer(modifier = Modifier.padding(0.dp, 5.dp))
+
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = service.value.name,
@@ -86,6 +100,7 @@ fun ManageServiceScreen(
                     focusedLabelColor = Color.White
                 ),
             )
+
 // Campo: Nombre de usuario
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
@@ -105,6 +120,7 @@ fun ManageServiceScreen(
                     focusedLabelColor = Color.White
                 ),
             )
+
 // Campo: Contraseña
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
@@ -124,6 +140,7 @@ fun ManageServiceScreen(
                     focusedLabelColor = Color.White
                 ),
             )
+
 // Campo: Descripción
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
@@ -164,6 +181,7 @@ fun ManageServiceScreen(
             ) {
                 Text(if (serviceId == "0") "CREATE SERVICE" else "SAVE CHANGES")
             }
+
             if (serviceId != null && serviceId.toInt() > 0) {
                 OutlinedButton(
                     border = BorderStroke(
@@ -179,7 +197,7 @@ fun ManageServiceScreen(
                         .padding(0.dp, 10.dp),
                     shape = CutCornerShape(4.dp),
                     onClick = {
-                        delete(viewModel, context, serviceId, navController)
+                        delete(viewModel, context, serviceId, navController, serviceDao)
                     }
                 ) {
                     Text("DELETE")
@@ -188,6 +206,7 @@ fun ManageServiceScreen(
         }
     }
 }
+
 fun save(
     viewModel: ServiceViewModel,
     context: Context,
@@ -228,15 +247,25 @@ fun save(
         }
     }
 }
+
 fun delete(
     viewModel: ServiceViewModel,
     context: Context,
     serviceId: String?,
-    navController: NavController
+    navController: NavController,
+    serviceDao: ServiceDao
 ) {
     if (serviceId != null && serviceId != "0") {
         viewModel.deleteService(serviceId.toInt()) { response ->
             if (response.isSuccessful) {
+
+                //
+                CoroutineScope(Dispatchers.IO).launch {
+                    val service = serviceDao.show(serviceId.toInt())
+                    serviceDao.delete(service)
+                }
+                //
+
                 Toast.makeText(
                     context,
                     "Service deleted successfully",
