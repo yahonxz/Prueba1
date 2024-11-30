@@ -3,12 +3,13 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.org.jetbrains.kotlin.kapt)
     alias(libs.plugins.hilt) // Add this line
+    id("com.google.devtools.ksp")
 
 }
 
 android {
     namespace = "com.example.prueba1"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.prueba1"
@@ -84,6 +85,7 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     //Dagger-hilt
     implementation("com.google.dagger:hilt-android:2.44.2")
+    implementation(libs.androidx.room.common)
     kapt("com.google.dagger:hilt-compiler:2.44.2") // Fix typo in your compiler dependency
     implementation("androidx.hilt:hilt-work:1.2.0")
     //--------------------------------
@@ -106,6 +108,10 @@ dependencies {
     //Camera and files
     //implementation("io.coil-kt:coil-compose:2.0.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
+
+    //SQLITE
+    val room_version = "2.6.1"
+    ksp("androidx.room:room-compiler:$room_version")
 
     //INTERNET
     ////////////////////////////////////////////////
